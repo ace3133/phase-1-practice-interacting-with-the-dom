@@ -1,73 +1,75 @@
-"use strict";
 
-const counter = document.getElementById("counter");
-let counterValue = parseInt(counter.innerText);
-let playing = true;
+let count = document.getElementById("counter");
+let dec = document.getElementById("minus");
+let plus = document.getElementById("plus");
+let heart = document.getElementById('heart');
+let pause = document.getElementById("pause");
+let submit = document.getElementById("submit");
+let form = document.getElementById("comment-form");
+let timer;
 
-function updateCounter(value) {
-    counter.innerText = value;
+function startTimer() {
+    timer = setInterval(() => count.innerText++, 1000);
 }
 
-function timer() {
-    return setInterval(function () {
-        counterValue++;
-        updateCounter(counterValue);
-    }, 1000);
+function stopTimer() {
+    clearInterval(timer);
 }
 
-let interval = timer();
+function add() {
+    plus.addEventListener("click", () => count.innerText++)
+}
 
-document.getElementById("minus").addEventListener("click", function () {
-    counterValue--;
-    updateCounter(counterValue);
-});
+function minus() {
+    dec.addEventListener("click", () => count.innerHTML--)
+}
 
-document.getElementById("plus").addEventListener("click", function () {
-    counterValue++;
-    updateCounter(counterValue);
-});
+function addheart() {
+    heart.addEventListener('click', () => {
+        const like = document.createElement("li");
+        like.innerText = `${count.innerText} ❤️`;
+       document.querySelector(".likes").appendChild(like)
 
-document.getElementById("heart").addEventListener("click", function () {
-    const likes = document.querySelector(".likes");
-    const existingLike = likes.querySelector(`[data-num="${counterValue}"]`);
+    })
+}
 
-    if (existingLike) {
-        const likeCount = existingLike.querySelector("span");
-        likeCount.innerText = parseInt(likeCount.innerText) + 1;
-    } else {
-        const newLike = document.createElement("li");
-        newLike.setAttribute("data-num", counterValue);
-        newLike.innerHTML = `${counterValue} has been liked <span>1</span> time`;
-        likes.appendChild(newLike);
-    }
-});
+function onSubmit(){
+    submit.addEventListener("click",(e)=>{
+        e.preventDefault();
+        let text = document.getElementById("comment-input");
+        let p = document.createElement("p");
+        const list = document.getElementById("list");
+        p.innerText = text.value
+        list.appendChild(p)
+        text.value = ""
+    })
+}
 
-document.getElementById("pause").addEventListener("click", function () {
-    if (playing) {
-        playing = false;
-        clearInterval(interval);
-        this.innerText = "resume";
-    } else {
-        playing = true;
-        interval = timer();
-        this.innerText = "pause";
-    }
 
-    document.querySelectorAll("button").forEach(button => {
-        if (button.id !== "pause") {
-            button.disabled = !playing;
+
+
+function pauseAndReset() {
+    pause.addEventListener('click', () => {
+        if (pause.innerText == "pause") {
+            stopTimer();
+            plus.disabled = true;
+            dec.disabled = true;
+            heart.disabled = true;
+            pause.innerText = "resume";
         }
-    });
-});
+        else if (pause.innerText == "resume") {
+            plus.disabled = false;
+            dec.disabled = false;
+            heart.disabled = false;
+            pause.innerText = "pause";
+            startTimer();
+        }   
+    })
+}
 
-document.querySelector("form").addEventListener("submit", function (event) {
-    event.preventDefault();
-    const commentInput = this.children[0];
-    const commentText = commentInput.value;
-    commentInput.value = "";
-
-    const comments = document.querySelector(".comments");
-    const newComment = document.createElement("p");
-    newComment.innerText = commentText;
-    comments.appendChild(newComment);
-});
+add();
+minus();
+addheart();
+pauseAndReset();
+onSubmit();
+startTimer();
